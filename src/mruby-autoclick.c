@@ -13,6 +13,8 @@
 #include <windows.h>
 #include "mruby.h"
 
+#define DRAG_WAIT_TIME 100
+
 static const char *MODULE_NAME = "AutoClick";
 
 static INPUT
@@ -98,6 +100,39 @@ mrb_autoclick_mouse_move(mrb_state *mrb, mrb_value klass)
 	return mrb_nil_value();
 }
 
+static mrb_value
+mrb_autoclick_left_drag(mrb_state *mrb, mrb_value klass)
+{
+	mrb_int sx, sy, ex, ey;
+	mrb_get_args(mrb, "iiii", &sx, &sy, &ex, &ey);
+	SetCursorPos(sx, sy);
+	Sleep(DRAG_WAIT_TIME);
+	SendInput(1, &LEFT_MOUSE_DOWN, sizeof(INPUT));
+	Sleep(DRAG_WAIT_TIME);
+	SetCursorPos(ex, ey);
+	Sleep(DRAG_WAIT_TIME);
+	SendInput(1, &LEFT_MOUSE_UP, sizeof(INPUT));
+	Sleep(DRAG_WAIT_TIME);
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_right_drag(mrb_state *mrb, mrb_value klass)
+{
+	mrb_int sx, sy, ex, ey;
+
+	mrb_get_args(mrb, "iiii", &sx, &sy, &ex, &ey);
+	SetCursorPos(sx, sy);
+	Sleep(DRAG_WAIT_TIME);
+	SendInput(1, &RIGHT_MOUSE_DOWN, sizeof(INPUT));
+	Sleep(DRAG_WAIT_TIME);
+	SetCursorPos(ex, ey);
+	Sleep(DRAG_WAIT_TIME);
+	SendInput(1, &RIGHT_MOUSE_UP, sizeof(INPUT));
+	Sleep(DRAG_WAIT_TIME);
+	return mrb_nil_value();
+}
+
 void
 mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 {
@@ -130,6 +165,14 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "mouse_move",
 		mrb_autoclick_mouse_move, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "left_drag",
+		mrb_autoclick_left_drag, MRB_ARGS_REQ(4)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "right_drag",
+		mrb_autoclick_right_drag, MRB_ARGS_REQ(4)
 	);
 }
 
