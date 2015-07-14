@@ -4,11 +4,19 @@ mruby-autoclick is a port of the auto_click ruby gem to mruby. It is used for si
 
 # Current Supported Usage:
 
-Mouse clicking can be supported by the following function calls:
+Mouse clicking can be performed using the following function calls:
 
-* `AutoClick.left_click`
-* `AutoClick.right_click`
-* `AutoClick.middle_click`
+```
+  AutoClick.left_click
+  AutoClick.right_click
+  AutoClick.middle_click
+  AutoClick.double_click
+```
+Cursor movement can be performed using the following function calls:
+
+```
+  AutoClick.mouse_move x, y
+```
 
 More features to be supported soon!
 

@@ -81,6 +81,23 @@ mrb_autoclick_middle_click(mrb_state *mrb, mrb_value klass)
 	return mrb_nil_value();
 }
 
+static mrb_value
+mrb_autoclick_double_click(mrb_state *mrb, mrb_value klass)
+{
+	mrb_autoclick_left_click(mrb, klass);
+	mrb_autoclick_left_click(mrb, klass);
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_mouse_move(mrb_state *mrb, mrb_value klass)
+{
+	mrb_int x, y;
+	mrb_get_args(mrb, "ii", &x, &y);
+	SetCursorPos(x, y);
+	return mrb_nil_value();
+}
+
 void
 mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 {
@@ -105,6 +122,14 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "middle_click",
 		mrb_autoclick_middle_click, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "double_click",
+		mrb_autoclick_double_click, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "mouse_move",
+		mrb_autoclick_mouse_move, MRB_ARGS_REQ(1)
 	);
 }
 
