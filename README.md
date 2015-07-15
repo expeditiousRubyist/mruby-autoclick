@@ -18,6 +18,9 @@ Cursor movement can be performed using the following function calls:
   AutoClick.mouse_move x, y
   AutoClick.left_drag sx, sy, ex, ey # s = start, e = end
   AutoClick.right_drag sx, sy, ex, ey
+
+  # One can also obtain cursor information with
+  pos = AutoClick.cursor_position
 ```
 
 More features to be supported soon!

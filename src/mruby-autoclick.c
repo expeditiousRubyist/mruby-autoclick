@@ -12,6 +12,7 @@
 
 #include <windows.h>
 #include "mruby.h"
+#include "mruby/array.h"
 
 #define DRAG_WAIT_TIME 100
 
@@ -92,6 +93,20 @@ mrb_autoclick_double_click(mrb_state *mrb, mrb_value klass)
 }
 
 static mrb_value
+mrb_autoclick_cursor_position(mrb_state *mrb, mrb_value klass)
+{
+	POINT pt;
+	mrb_value ary;
+	mrb_value vals[2];
+
+	GetCursorPos(&pt);
+	vals[0] = mrb_fixnum_value(pt.x);
+	vals[1] = mrb_fixnum_value(pt.y);
+	ary = mrb_ary_new_from_values(mrb, 2, vals);
+	return ary;
+}
+
+static mrb_value
 mrb_autoclick_mouse_move(mrb_state *mrb, mrb_value klass)
 {
 	mrb_int x, y;
@@ -163,8 +178,12 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 		mrb_autoclick_double_click, MRB_ARGS_NONE()
 	);
 	mrb_define_module_function(
+		mrb, auto_click, "cursor_position",
+		mrb_autoclick_cursor_position, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
 		mrb, auto_click, "mouse_move",
-		mrb_autoclick_mouse_move, MRB_ARGS_REQ(1)
+		mrb_autoclick_mouse_move, MRB_ARGS_REQ(2)
 	);
 	mrb_define_module_function(
 		mrb, auto_click, "left_drag",
