@@ -16,7 +16,8 @@
 
 #define DRAG_WAIT_TIME 100
 
-static const char *MODULE_NAME = "AutoClick";
+static const char *MODULE_NAME    = "AutoClick";
+static const char *VK_MODULE_NAME = "VirtualKey";
 
 static INPUT
 make_mouse_input(LONG dx, LONG dy, DWORD mouseData, 
@@ -148,6 +149,83 @@ mrb_autoclick_right_drag(mrb_state *mrb, mrb_value klass)
 	return mrb_nil_value();
 }
 
+static mrb_value
+mrb_autoclick_key_down(mrb_state* mrb, mrb_value klass)
+{
+	INPUT ip;
+	mrb_sym key_name;
+	mrb_int key_code;
+	mrb_value vk_module;
+	mrb_value tmp;
+
+	mrb_get_args(mrb, "n", &key_name);
+	vk_module = mrb_obj_value(mrb_module_get(mrb, VK_MODULE_NAME));
+	tmp = mrb_symbol_value(key_name);
+	tmp = mrb_funcall(mrb, vk_module, "code_from_name", 1, tmp);
+	key_code = mrb_fixnum(tmp);
+
+	ip.type = INPUT_KEYBOARD;
+	ip.ki.wVk = key_code;
+	ip.ki.wScan = 0;
+	ip.ki.dwFlags = 0; // Key down
+	ip.ki.time = 0;
+	ip.ki.dwExtraInfo = 0;
+	SendInput(1, &ip, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_key_up(mrb_state* mrb, mrb_value klass)
+{
+	INPUT ip;
+	mrb_sym key_name;
+	mrb_int key_code;
+	mrb_value vk_module;
+	mrb_value tmp;
+
+	mrb_get_args(mrb, "n", &key_name);
+	vk_module = mrb_obj_value(mrb_module_get(mrb, VK_MODULE_NAME));
+	tmp = mrb_symbol_value(key_name);
+	tmp = mrb_funcall(mrb, vk_module, "code_from_name", 1, tmp);
+	key_code = mrb_fixnum(tmp);
+
+	ip.type = INPUT_KEYBOARD;
+	ip.ki.wVk = key_code;
+	ip.ki.wScan = 0;
+	ip.ki.dwFlags = 2; // Key up
+	ip.ki.time = 0;
+	ip.ki.dwExtraInfo = 0;
+	SendInput(1, &ip, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_key_stroke(mrb_state* mrb, mrb_value klass)
+{
+	INPUT ips[2];
+	mrb_sym key_name;
+	mrb_int key_code;
+	mrb_value vk_module;
+	mrb_value tmp;
+
+	mrb_get_args(mrb, "n", &key_name);
+	vk_module = mrb_obj_value(mrb_module_get(mrb, VK_MODULE_NAME));
+	tmp = mrb_symbol_value(key_name);
+	tmp = mrb_funcall(mrb, vk_module, "code_from_name", 1, tmp);
+	key_code = mrb_fixnum(tmp);
+
+	ips[0].type = INPUT_KEYBOARD;
+	ips[0].ki.wVk = key_code;
+	ips[0].ki.wScan = 0;
+	ips[0].ki.dwFlags = 0; // Key down
+	ips[0].ki.time = 0;
+	ips[0].ki.dwExtraInfo = 0;
+	ips[1] = ips[0];
+	ips[1].ki.dwFlags = 2; // Key up
+	SendInput(2, ips, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
 void
 mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 {
@@ -192,6 +270,18 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "right_drag",
 		mrb_autoclick_right_drag, MRB_ARGS_REQ(4)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "key_down",
+		mrb_autoclick_key_down, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "key_up",
+		mrb_autoclick_key_up, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "key_stroke",
+		mrb_autoclick_key_stroke, MRB_ARGS_REQ(1)
 	);
 }
 
