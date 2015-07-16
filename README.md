@@ -1,41 +1,42 @@
 # mruby-autoclick
 
-mruby-autoclick is a port of the auto_click ruby gem to mruby. It is used for simulating mouse clicks, cursor movement, and keystrokes on Windows computers. Non-Windows platforms are not supported, as mruby-autoclick -- like its predecessor -- relies on functions in User32.DLL. Modification to support Unix platforms, however, would be much-welcomed.
+mruby-autoclick is an MRuby gem for automating mouse clicks, cursor movement, and keystrokes on the Windows platform, based roughly on the API provided in the auto_click gem for Ruby, written by erinata (source: https://github.com/erinata/auto_click). It has been modified in a few ways - namely, the majority of the code is written in C, for both performance reasons, and because MRuby does not ship with a means of calling functions in Windows DLLs. A few of the functions have been changed as well.
 
-# Current Supported Usage:
+# Available functions
 
-Mouse clicking can be performed using the following function calls:
-
-```
-  AutoClick.left_click
-  AutoClick.right_click
-  AutoClick.middle_click
-  AutoClick.double_click
-```
-Cursor movement can be performed using the following function calls:
+The following functions are available under the `AutoClick` module
 
 ```
-  AutoClick.mouse_move x, y
-  AutoClick.left_drag sx, sy, ex, ey # s = start, e = end
-  AutoClick.right_drag sx, sy, ex, ey
+# Functions for controlling mouse clicks.
+left_click
+right_click
+middle_click
+double_click
 
-  # One can also obtain cursor information with
-  pos = AutoClick.cursor_position
-```
+# Functions for controlling mouse movement.
+# (x, y) coordinates have the origin at the top-left corner of the screen.
+# For drag functions, s = starting coordinate, e = ending coordinate.
+mouse_move(x, y)
+left_drag(sx, sy, ex, ey)
+right_drag(sx, sy, ex, ey)
 
-The keyboard can be controlled through these function calls
-```
-  # To type a capital 'A'
-  AutoClick.key_down :leftshift # Hold down key
-  AutoClick.key_stroke :a       # Press key
-  AutoClick.key_up :left_shift  # Release key
+# Functions for controlling the keyboard.
+# Keyname values are available in a hash table in the VirtualKey module.
+# Note that for some keys, a US keyboard is assumed. These keys are labeled
+# explicitly in the virtual_key.rb file as "US Only."
+key_down(keyname)
+key_up(keyname)
+key_stroke(keyname)
+type(str) # Note: str must be encoded as UTF-8
 
-  # Or in one command
-  AutoClick.type "A" # Note: must be UTF-8 encoded
+# Functions for querying keyboard/mouse state
+is_key_down?(keyname)
+is_key_toggled?(keyname)
+cursor_position
 ```
 
 More features to be supported soon!
 
 # Licensing and Copyright:
 
-mruby-autoclick is available under the MIT License, as its predecessor auto_click was. The original source code by Tom Lam can be found at https://github.com/erinata/auto_click
+mruby-autoclick is available under the MIT License, as its predecessor auto_click was. The original source code by erinata can be found at https://github.com/erinata/auto_click
