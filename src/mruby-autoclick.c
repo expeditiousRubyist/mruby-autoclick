@@ -167,7 +167,7 @@ mrb_autoclick_key_down(mrb_state* mrb, mrb_value klass)
 	ip.type = INPUT_KEYBOARD;
 	ip.ki.wVk = key_code;
 	ip.ki.wScan = 0;
-	ip.ki.dwFlags = 0; // Key down
+	ip.ki.dwFlags = 0; /* Key down */
 	ip.ki.time = 0;
 	ip.ki.dwExtraInfo = 0;
 	SendInput(1, &ip, sizeof(INPUT));
@@ -217,11 +217,11 @@ mrb_autoclick_key_stroke(mrb_state* mrb, mrb_value klass)
 	ips[0].type = INPUT_KEYBOARD;
 	ips[0].ki.wVk = key_code;
 	ips[0].ki.wScan = 0;
-	ips[0].ki.dwFlags = 0; // Key down
+	ips[0].ki.dwFlags = 0; /* Key down */
 	ips[0].ki.time = 0;
 	ips[0].ki.dwExtraInfo = 0;
 	ips[1] = ips[0];
-	ips[1].ki.dwFlags = 2; // Key up
+	ips[1].ki.dwFlags = 2; /* Key up */
 	SendInput(2, ips, sizeof(INPUT));
 	return mrb_nil_value();
 }
@@ -272,6 +272,56 @@ mrb_autoclick_type(mrb_state *mrb, mrb_value klass)
 
 	free(output_str);
 	return mrb_nil_value();
+}
+
+/* Function to indicate that a key is currently "down"
+ * "down" would be equivalent to someone having their finger down
+ * on the key at the current moment.
+ */
+static mrb_value
+mrb_autoclick_is_key_down(mrb_state *mrb, mrb_value klass)
+{
+	SHORT key_state;
+	mrb_sym key_name;
+	mrb_int key_code;
+	mrb_value vk_module;
+	mrb_value tmp;
+
+	mrb_get_args(mrb, "n", &key_name);
+	vk_module = mrb_obj_value(mrb_module_get(mrb, VK_MODULE_NAME));
+	tmp = mrb_symbol_value(key_name);
+	tmp = mrb_funcall(mrb, vk_module, "code_from_name", 1, tmp);
+	key_code = mrb_fixnum(tmp);
+	key_state = GetKeyState(key_code);
+
+	/* High order bit (sign bit) = key is down */
+	if (key_state < 0) return mrb_true_value();
+	else return mrb_false_value();
+}
+
+/* Function to indicate that a key is currently "toggled"
+ * "toggled" would mean that the key is in some way "active,"
+ * namely, a caps lock or num lock key being active.
+ */
+static mrb_value
+mrb_autoclick_is_key_toggled(mrb_state *mrb, mrb_value klass)
+{
+	SHORT key_state;
+	mrb_sym key_name;
+	mrb_int key_code;
+	mrb_value vk_module;
+	mrb_value tmp;
+
+	mrb_get_args(mrb, "n", &key_name);
+	vk_module = mrb_obj_value(mrb_module_get(mrb, VK_MODULE_NAME));
+	tmp = mrb_symbol_value(key_name);
+	tmp = mrb_funcall(mrb, vk_module, "code_from_name", 1, tmp);
+	key_code = mrb_fixnum(tmp);
+	key_state = GetKeyState(key_code);
+
+	/* Low order bit (even/odd bit) = key is toggled */
+	if (key_state & 0x1) return mrb_true_value();
+	else return mrb_false_value();
 }
 
 void
@@ -334,6 +384,14 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "type",
 		mrb_autoclick_type, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "is_key_down?",
+		mrb_autoclick_is_key_down, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "is_key_toggled?",
+		mrb_autoclick_is_key_toggled, MRB_ARGS_REQ(1)
 	);
 }
 
