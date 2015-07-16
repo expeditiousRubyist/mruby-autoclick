@@ -23,6 +23,17 @@ Cursor movement can be performed using the following function calls:
   pos = AutoClick.cursor_position
 ```
 
+The keyboard can be controlled through these function calls
+```
+  # To type a capital 'A'
+  AutoClick.key_down :leftshift # Hold down key
+  AutoClick.key_stroke :a       # Press key
+  AutoClick.key_up :left_shift  # Release key
+
+  # Or in one command
+  AutoClick.type "A" # Note: must be UTF-8 encoded
+```
+
 More features to be supported soon!
 
 # Licensing and Copyright:

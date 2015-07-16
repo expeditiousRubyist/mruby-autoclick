@@ -226,6 +226,54 @@ mrb_autoclick_key_stroke(mrb_state* mrb, mrb_value klass)
 	return mrb_nil_value();
 }
 
+static mrb_value
+mrb_autoclick_type(mrb_state *mrb, mrb_value klass)
+{
+	INPUT ips[2];
+	int i;
+	int nchars;
+	char *input_str;
+	mrb_int input_str_len;
+	LPWSTR output_str;
+
+	mrb_get_args(mrb, "s", &input_str, &input_str_len);
+	if (!input_str_len)
+		return mrb_nil_value();
+
+	/* Get number of wchars to use in the buffer */
+	nchars = MultiByteToWideChar(
+		CP_UTF8, MB_ERR_INVALID_CHARS,
+		input_str, input_str_len,
+		NULL, 0
+	);
+
+	/* Create buffer and convert from UTF-8 to UTF-16 */
+	output_str = malloc(nchars * sizeof(WCHAR));
+	nchars = MultiByteToWideChar(
+		CP_UTF8, MB_ERR_INVALID_CHARS,
+		input_str, input_str_len,
+		output_str, nchars
+	);
+
+	/* Type each character in buffer as unicode (UTF-16) */
+	ips[0].type = INPUT_KEYBOARD;
+	ips[0].ki.wVk = 0;
+	ips[0].ki.dwFlags = KEYEVENTF_UNICODE;
+	ips[0].ki.time = 0;
+	ips[0].ki.dwExtraInfo = 0;
+	ips[1] = ips[0];
+	ips[1].ki.dwFlags |= KEYEVENTF_KEYUP;
+
+	for (i=0; i<nchars; ++i) {
+		ips[0].ki.wScan = output_str[i];
+		ips[1].ki.wScan = output_str[i];
+		SendInput(2, ips, sizeof(INPUT));
+	}
+
+	free(output_str);
+	return mrb_nil_value();
+}
+
 void
 mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 {
@@ -282,6 +330,10 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "key_stroke",
 		mrb_autoclick_key_stroke, MRB_ARGS_REQ(1)
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "type",
+		mrb_autoclick_type, MRB_ARGS_REQ(1)
 	);
 }
 
