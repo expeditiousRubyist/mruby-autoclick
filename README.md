@@ -20,6 +20,13 @@ mouse_move(x, y)
 left_drag(sx, sy, ex, ey)
 right_drag(sx, sy, ex, ey)
 
+# Functions for controlling the mouse wheel.
+# Note that for both functions, direction is an integer, with positive values
+# representing a "scroll up/left" and negative values representing a "scroll
+# down/right."
+mouse_scroll_vertical(direction)
+mouse_scroll_horizontal(direction) # For Windows >= Vista
+
 # Functions for controlling the keyboard.
 # Keyname values are available in a hash table in the VirtualKey module.
 # Note that for some keys, a US keyboard is assumed. These keys are labeled

@@ -19,7 +19,7 @@
 static const char *MODULE_NAME    = "AutoClick";
 static const char *VK_MODULE_NAME = "VirtualKey";
 
-static INPUT
+static inline INPUT
 make_mouse_input(LONG dx, LONG dy, DWORD mouseData, 
                  DWORD dwFlags, DWORD time, ULONG_PTR dwExtraInfo)
 {
@@ -115,6 +115,39 @@ mrb_autoclick_mouse_move(mrb_state *mrb, mrb_value klass)
 	SetCursorPos(x, y);
 	return mrb_nil_value();
 }
+
+static mrb_value
+mrb_autoclick_mouse_scroll_vertical(mrb_state *mrb, mrb_value klass)
+{
+	INPUT ip;
+	mrb_int direction;
+
+	mrb_get_args(mrb, "i", &direction);
+	ip = make_mouse_input(
+		0, 0, WHEEL_DELTA * direction,
+		MOUSEEVENTF_WHEEL, 0, 0
+	);
+	SendInput(1, &ip, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+/* If we are using Vista or higher */
+#if WINVER >= 0x0600
+static mrb_value
+mrb_autoclick_mouse_scroll_horizontal(mrb_state *mrb, mrb_value klass)
+{
+	INPUT ip;
+	mrb_int direction;
+
+	mrb_get_args(mrb, "i", &direction);
+	ip = make_mouse_input(
+		0, 0, WHEEL_DELTA * direction,
+		MOUSEEVENTF_HWHEEL, 0, 0
+	);
+	SendInput(1, &ip, sizeof(INPUT));
+	return mrb_nil_value();
+}
+#endif
 
 static mrb_value
 mrb_autoclick_left_drag(mrb_state *mrb, mrb_value klass)
@@ -361,6 +394,16 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 		mrb, auto_click, "mouse_move",
 		mrb_autoclick_mouse_move, MRB_ARGS_REQ(2)
 	);
+	mrb_define_module_function(
+		mrb, auto_click, "mouse_scroll_vertical",
+		mrb_autoclick_mouse_scroll_vertical, MRB_ARGS_REQ(1)
+	);
+#if WINVER >= 0x0600
+	mrb_define_module_function(
+		mrb, auto_click, "mouse_scroll_horizontal",
+		mrb_autoclick_mouse_scroll_horizontal, MRB_ARGS_REQ(1)
+	);
+#endif
 	mrb_define_module_function(
 		mrb, auto_click, "left_drag",
 		mrb_autoclick_left_drag, MRB_ARGS_REQ(4)
