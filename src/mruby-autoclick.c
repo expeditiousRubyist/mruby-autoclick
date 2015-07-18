@@ -86,6 +86,48 @@ mrb_autoclick_middle_click(mrb_state *mrb, mrb_value klass)
 }
 
 static mrb_value
+mrb_autoclick_left_mouse_down(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &LEFT_MOUSE_DOWN, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_right_mouse_down(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &RIGHT_MOUSE_DOWN, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_middle_mouse_down(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &MIDDLE_MOUSE_DOWN, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_left_mouse_up(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &LEFT_MOUSE_UP, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_right_mouse_up(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &RIGHT_MOUSE_UP, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
+mrb_autoclick_middle_mouse_up(mrb_state *mrb, mrb_value klass)
+{
+	SendInput(1, &MIDDLE_MOUSE_UP, sizeof(INPUT));
+	return mrb_nil_value();
+}
+
+static mrb_value
 mrb_autoclick_double_click(mrb_state *mrb, mrb_value klass)
 {
 	mrb_autoclick_left_click(mrb, klass);
@@ -381,6 +423,30 @@ mrb_mruby_autoclick_gem_init(mrb_state *mrb)
 	mrb_define_module_function(
 		mrb, auto_click, "middle_click",
 		mrb_autoclick_middle_click, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "left_mouse_down",
+		mrb_autoclick_left_mouse_down, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "right_mouse_down",
+		mrb_autoclick_right_mouse_down, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "middle_mouse_down",
+		mrb_autoclick_middle_mouse_down, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "left_mouse_up",
+		mrb_autoclick_left_mouse_up, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "right_mouse_up",
+		mrb_autoclick_right_mouse_up, MRB_ARGS_NONE()
+	);
+	mrb_define_module_function(
+		mrb, auto_click, "middle_mouse_up",
+		mrb_autoclick_middle_mouse_up, MRB_ARGS_NONE()
 	);
 	mrb_define_module_function(
 		mrb, auto_click, "double_click",

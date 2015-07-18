@@ -8,10 +8,18 @@ The following functions are available under the `AutoClick` module
 
 ```
 # Functions for controlling mouse clicks.
+left_mouse_down
+left_mouse_up
 left_click
-right_click
-middle_click
 double_click
+
+right_mouse_down
+right_mouse_up
+right_click
+
+middle_mouse_down
+middle_mouse_up
+middle_click
 
 # Functions for controlling mouse movement.
 # (x, y) coordinates have the origin at the top-left corner of the screen.
